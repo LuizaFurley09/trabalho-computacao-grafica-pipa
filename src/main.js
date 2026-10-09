@@ -1,5 +1,5 @@
 import WebGPU from '../lib/webgpu.js';
-import {multiplyMat4, createIdentityMat4, createLookAtMat4, createOrthographicMat4} from '../lib/utils.js';
+import {multiplyMat4, createTranslationMat4, createRotationZMat4, createLookAtMat4, createOrthographicMat4} from '../lib/utils.js';
 import {vertexShader, fragmentShader} from './shaders.js';
 
 import {kitePositions, kiteColors, KITE_VERTEX_COUNT, fitaBasePositions, fita1Colors, fita2Colors, FITA_VERTEX_COUNT, computeTailModels} from './pipaCauda.js';
@@ -42,14 +42,21 @@ async function main() {
   const proj = createOrthographicMat4(-1.7, 1.7, -1.7, 1.7, 0.1, 100);
   const vp   = multiplyMat4(proj, view);
 
-  const kiteModel = createIdentityMat4();
-
   const start = performance.now();
+  const freq_Y = 0.5;
+  const amp_Y = 0.3;
+  const freq_rot = 0.7;
+  const amp_rot = 0.15;
+  const fase_rot = Math.PI / 3;
+
 
   function frame(now) {
     const t = (now - start) / 1000;
+    const kiteY = amp_Y * Math.sin(2*Math.PI * freq_Y * t);
+    const kiteRot = amp_rot * Math.sin(2*Math.PI * freq_rot * t + fase_rot);
+    const kiteModel = multiplyMat4(createTranslationMat4(0, kiteY, 0), createRotationZMat4(kiteRot));
 
-    const { fita1Model, fita2Model } = computeTailModels(t, 0, 0);
+    const { fita1Model, fita2Model } = computeTailModels(t, kiteY, kiteRot);
 
     gpu.writeBuffer(uKite.buffer,  multiplyMat4(vp, kiteModel));
     gpu.writeBuffer(uFita1.buffer, multiplyMat4(vp, fita1Model));
