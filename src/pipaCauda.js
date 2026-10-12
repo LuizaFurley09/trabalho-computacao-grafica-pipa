@@ -2,11 +2,11 @@ import {createTranslationMat4, createRotationZMat4, multiplyMat4} from '../lib/u
 
 export const kitePositions = new Float32Array([
    0.0,  0.70, 0.0, 1.0,
-  -0.3,  0.00, 0.0, 1.0,
+  -0.4,  0.00, 0.0, 1.0,
    0.0, -0.70, 0.0, 1.0, 
    0.0,  0.70, 0.0, 1.0,   
    0.0, -0.70, 0.0, 1.0,
-   0.3,  0.00, 0.0, 1.0,
+   0.4,  0.00, 0.0, 1.0,
 ]);
 
 const VERMELHO = [0.93, 0.11, 0.14, 1.0];

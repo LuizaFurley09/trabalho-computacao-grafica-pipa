@@ -36,11 +36,25 @@ async function main() {
     });
   });
 
-  // Câmera FIXA - provisória
-  const view = createLookAtMat4([0, 0, 3], [0, 0, 0], [0, 1, 0], true);
+  function createViewMatrix(posy_object){
+    const eye = [0, posy_object, 3];
+    const at = [0, posy_object, 0];
+    const up = [0, 1, 0];
 
-  const proj = createOrthographicMat4(-1.7, 1.7, -1.7, 1.7, 0.1, 100);
-  const vp   = multiplyMat4(proj, view);
+    return createLookAtMat4(eye, at, up, true);
+  }
+
+  function createProjectionMatrix(){
+    const aspect = gpu.canvas.width/gpu.canvas.height;
+    const left = -1.7 * aspect;
+    const right = -left;
+    const bottom = -1.7;
+    const top = -bottom;
+    const near = 0.1;
+    const far = 100;
+
+    return createOrthographicMat4(left, right, bottom, top, near, far);
+  }  
 
   const start = performance.now();
   const freq_Y = 0.5;
@@ -55,6 +69,11 @@ async function main() {
     const kiteY = amp_Y * Math.sin(2*Math.PI * freq_Y * t);
     const kiteRot = amp_rot * Math.sin(2*Math.PI * freq_rot * t + fase_rot);
     const kiteModel = multiplyMat4(createTranslationMat4(0, kiteY, 0), createRotationZMat4(kiteRot));
+    const cameraFollow = 0.5;
+    const frct_kiteY = cameraFollow * kiteY;
+    const view = createViewMatrix(frct_kiteY);
+    const proj = createProjectionMatrix();
+    const vp   = multiplyMat4(proj, view);
 
     const { fita1Model, fita2Model } = computeTailModels(t, kiteY, kiteRot);
 
